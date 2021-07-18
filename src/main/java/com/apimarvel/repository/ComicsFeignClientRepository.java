@@ -11,16 +11,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 //@FeignClient(name = "get", url = "http://gateway.marvel.com" .marvel.com)
 @FeignClient(url = "http://gateway.marvel.com", name="developer.marvel.com")
 public interface ComicsFeignClientRepository {	
-	
 
-	@GetMapping(value="/v1/public/comics/{comicId}")
-	//@GetMapping(value="/{comicId}")
+	@GetMapping(value="/v1/public/comics/{comicId}")	
 	public ResponseEntity<String> getComicPorId(
 			@PathVariable Long comicId,
 			@RequestParam("ts") String timestamp,
 			@RequestParam("apikey") String publicKey,
 			@RequestParam("hash") String hash
 			);
-	
 	
 }

@@ -26,11 +26,14 @@ public class Comic implements Serializable {
 	private String creators;
 	private String isbn;
 	
-	@Column(columnDefinition = "TEXT")//o columnDefinition como 'TEXT' aceita strings grandes no banco.
+	//o columnDefinition como 'TEXT' 
+	//aceita strings grandes no banco.
+	@Column(columnDefinition = "TEXT")
 	private String description;
 	private EnumDiaDaSemana discountDay;
 	
-	@ManyToMany(mappedBy = "comics")//nome do elemento Set referenciado em products
+	//nome do elemento Set referenciado em products
+	@ManyToMany(mappedBy = "comics")
 	private Set<Usuario> usuarios = new HashSet<>();
 	
 	public Comic() {		

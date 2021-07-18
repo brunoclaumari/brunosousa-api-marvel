@@ -38,7 +38,8 @@ public class UsuarioService {
 		 * personalizada criada caso o 'usu' não traga valores na requisição.
 		 */
 		Optional<Usuario> op = repositorioUsuario.findById(id);
-		Usuario usu = op.orElseThrow(() -> new EntidadeNaoEncontradaException("Entidade não foi encontrada"));
+		Usuario usu = op
+				.orElseThrow(() -> new EntidadeNaoEncontradaException("Entidade não foi encontrada"));
 
 		return new UsuarioDTO(usu, usu.getComics());
 	}

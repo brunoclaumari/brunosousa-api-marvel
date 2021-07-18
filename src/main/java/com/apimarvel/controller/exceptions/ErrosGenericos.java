@@ -7,16 +7,6 @@ public class ErrosGenericos implements Serializable  {
 	
 	private static final long serialVersionUID = 1L;
 	
-	/*
-	 * {
-	    "timestamp": "2020-12-01T01:07:09.393+00:00",
-	    "status": 500,
-	    "error": "Internal Server Error",
-	    "message": "",
-	    "path": "/categories/5"
-	   }
-*/
-	
 	private Instant timestamp;
 	private Integer status;
 	private String erro;

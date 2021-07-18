@@ -29,13 +29,11 @@ public class UsuarioController {
 	UsuarioService usuService;
 	
 	@Autowired
-	private ComicService comService;
-	
+	private ComicService comService;	
 	
 	@GetMapping(value = "/{id}")
 	public ResponseEntity<UsuarioDTO> buscaUsuarioPorId(@PathVariable Long id){
-		UsuarioDTO dto = usuService.buscaUsuarioPorId(id);
-		
+		UsuarioDTO dto = usuService.buscaUsuarioPorId(id);		
 		return ResponseEntity.ok().body(dto);
 	}
 	
@@ -48,7 +46,9 @@ public class UsuarioController {
 		}		
 		
 		dto = usuService.inserir(dto);
-		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(dto.getId()).toUri();
+		URI uri = ServletUriComponentsBuilder
+				.fromCurrentRequest()
+				.path("/{id}").buildAndExpand(dto.getId()).toUri();
 
 		return ResponseEntity.created(uri).body(dto);
 	}

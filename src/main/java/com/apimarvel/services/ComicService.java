@@ -55,7 +55,8 @@ public class ComicService {
 			return comicDto;
 
 		} catch (FeignException.NotFound e) {
-			throw new EntidadeNaoEncontradaException("O Usuário com id "+comicId+" não foi encontrado na API da Marvel");
+			String msg = "O Usuário com id "+comicId+" não foi encontrado na API da Marvel";
+			throw new EntidadeNaoEncontradaException(msg);
 		}	
 	}
 
