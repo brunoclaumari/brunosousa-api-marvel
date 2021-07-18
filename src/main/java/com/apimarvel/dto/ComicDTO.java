@@ -1,12 +1,11 @@
 package com.apimarvel.dto;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 
 import org.springframework.lang.Nullable;
 
-import com.apimarvel.entities.Autor;
 import com.apimarvel.entities.Comic;
+import com.apimarvel.enums.EnumDiaDaSemana;
 
 public class ComicDTO implements Serializable {
 
@@ -17,16 +16,17 @@ public class ComicDTO implements Serializable {
 	private Double price;	
 	private String creators;
 	private String isbn;
+	@Nullable
 	private String description;
-	private Integer discountDay;
+	private EnumDiaDaSemana discountDay;
 	private Boolean activeDiscount = false;
 
 	public ComicDTO() {
 	}
 
-	public ComicDTO(Long comicId, String title, Double price, String creators, String isbn,
-			String description, Integer discountDay) {
-		this.id = comicId;
+	public ComicDTO(Long id, String title, Double price, String creators, String isbn,
+			String description, EnumDiaDaSemana discountDay) {
+		this.id = id;
 		this.title = title;
 		this.price = price;
 		this.creators = creators;
@@ -52,12 +52,12 @@ public class ComicDTO implements Serializable {
 //		creators.forEach(a -> this.creators.add(new AutorDTO(a.getName())));
 //	}
 
-	public Long getComicId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setComicId(Long comicId) {
-		this.id = comicId;
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 	public String getTitle() {
@@ -100,11 +100,11 @@ public class ComicDTO implements Serializable {
 		this.description = description;
 	}
 
-	public Integer getDiscountDay() {
+	public EnumDiaDaSemana getDiscountDay() {
 		return discountDay;
 	}
 
-	public void setDiscountDay(Integer discountDay) {
+	public void setDiscountDay(EnumDiaDaSemana discountDay) {
 		this.discountDay = discountDay;
 	}	
 
@@ -119,10 +119,11 @@ public class ComicDTO implements Serializable {
 	@Override
 	public String toString() {
 		return "ComicDTO [id=" + id + ", title=" + title + ", price=" + price + ", creators=" + creators + ", isbn="
-				+ isbn + ", description=" + description + ", discountDay=" + discountDay + ", activeDiscount="
+				+ isbn + ", description=" + description + ", discountDay=" + discountDay.name() + ", activeDiscount="
 				+ activeDiscount + "]";
 	}
-	
+
+
 	
 
 }

@@ -31,7 +31,7 @@ public class ComicController {
 		dto = comicService.insert(dto);
 		//comicService.configuraRegrasParaExibicao(dto);
 		
-		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{comicId}").buildAndExpand(dto.getComicId()).toUri();
+		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{comicId}").buildAndExpand(dto.getId()).toUri();
 
 		return ResponseEntity.created(uri).body(dto);
 	}

@@ -5,28 +5,27 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.time.Instant;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
+
+import javax.persistence.EntityNotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.apimarvel.dto.AutorDTO;
 import com.apimarvel.dto.ComicDTO;
-import com.apimarvel.entities.Autor;
 import com.apimarvel.entities.Comic;
-import com.apimarvel.enums.EnumDiaDaSemana;
 import com.apimarvel.repository.ComicRepository;
 import com.apimarvel.repository.ComicsFeignClientRepository;
+import com.apimarvel.services.exceptions.EntidadeNaoEncontradaException;
 import com.apimarvel.utils.ComicUtils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+
+import feign.FeignException;
 
 @Service
 public class ComicService {
@@ -38,7 +37,7 @@ public class ComicService {
 	private String privateKey;
 
 	@Value("${marvel.public_key}")
-	private String publicKey;	
+	private String publicKey;
 
 	Long timestamp = Calendar.getInstance().getTimeInMillis();
 
@@ -47,12 +46,17 @@ public class ComicService {
 
 	@Transactional(readOnly = true)
 	public ComicDTO buscaComicPorId(Long comicId) {
-		JsonElement respostaReq = com.google.gson.JsonParser.parseString(comicsFeignClientRepository
-				.getComicPorId(comicId, timestamp.toString(), publicKey, retornaHash()).getBody());
+		try {
+			JsonElement respostaReq = com.google.gson.JsonParser.parseString(comicsFeignClientRepository
+					.getComicPorId(comicId, timestamp.toString(), publicKey, retornaHash()).getBody());
 
-		ComicDTO comicDto = copiaJsonParaComicDto(respostaReq);
+			ComicDTO comicDto = copiaJsonParaComicDto(respostaReq);
 
-		return comicDto;
+			return comicDto;
+
+		} catch (FeignException.NotFound e) {
+			throw new EntidadeNaoEncontradaException("O Usuário com id "+comicId+" não foi encontrado na API da Marvel");
+		}	
 	}
 
 	/**
@@ -99,7 +103,7 @@ public class ComicService {
 			if (i == 0)
 				autores += valorDoCampo.trim();
 			else
-				autores += "-" + valorDoCampo.trim();
+				autores += ", " + valorDoCampo.trim();
 		}
 		return autores;
 	}
@@ -109,7 +113,7 @@ public class ComicService {
 		JsonObject jsonobj = respostaRequisicao.getAsJsonObject().get("data").getAsJsonObject()
 				.getAsJsonArray("results").get(0).getAsJsonObject();
 
-		dto.setComicId(jsonobj.get("id").getAsLong());
+		dto.setId(jsonobj.get("id").getAsLong());
 		dto.setTitle(jsonobj.get("title").getAsString());
 		dto.setPrice(jsonobj.getAsJsonArray("prices").get(0).getAsJsonObject().get("price").getAsDouble());
 
@@ -120,18 +124,15 @@ public class ComicService {
 
 		dto.setCreators(autores);
 		dto.setIsbn(jsonobj.get("isbn").getAsString());
-		dto.setDescription(jsonobj.get("description").getAsString());
+		dto.setDescription(jsonobj.get("description").isJsonNull() ? "" : jsonobj.get("description").getAsString());
 		dto.setDiscountDay(ComicUtils.retornaDiaDoDesconto(dto.getIsbn()));
 
 		return dto;
 	}
 
 	private void copiarDtoParaEntidade(ComicDTO dto, Comic entidade) {
-		entidade.setId(dto.getComicId());
+		entidade.setId(dto.getId());
 		entidade.setCreators(dto.getCreators());
-//		dto.getCreators().forEach(autDto ->
-//			entidade.getCreators().add(new Autor(autDto.getName()))
-//		);
 		entidade.setDescription(dto.getDescription());
 		entidade.setIsbn(dto.getIsbn());
 		entidade.setDiscountDay(dto.getDiscountDay());
@@ -140,27 +141,10 @@ public class ComicService {
 
 	}
 
-//	public int retornaDiaDoDesconto(String isbn) {
-//		int numeroIsbn = 0;
-//		if(!isbn.isEmpty()) {
-//			numeroIsbn = (int)isbn.charAt(isbn.length()-1);
-//			if(numeroIsbn==0||numeroIsbn==1)
-//				return EnumDiaDaSemana.SEGUNDA.getDiaDaSemana();
-//			else if(numeroIsbn==2||numeroIsbn==3)
-//				return EnumDiaDaSemana.TERCA.getDiaDaSemana();
-//			else if(numeroIsbn==4||numeroIsbn==5)
-//				return EnumDiaDaSemana.QUARTA.getDiaDaSemana();
-//			else if(numeroIsbn==6||numeroIsbn==7)
-//				return EnumDiaDaSemana.QUINTA.getDiaDaSemana();
-//			else if(numeroIsbn==8||numeroIsbn==9)
-//				return EnumDiaDaSemana.SEXTA.getDiaDaSemana();
-//		}
-//		return numeroIsbn;
-//	}
 
 	public void verificaDescontoAtivo(ComicDTO dto) {
 		int diaSemana = LocalDate.now().getDayOfWeek().getValue();
-		if (dto.getDiscountDay() == diaSemana) {
+		if (dto.getDiscountDay().getDiaDaSemana() == diaSemana) {
 			dto.setActiveDiscount(true);
 			System.out.println("Desconto foi ativado");
 		}
