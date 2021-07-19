@@ -67,6 +67,7 @@ public class ComicService {
 	public ComicDTO insert(ComicDTO dto) {
 		Comic comic = new Comic();
 		copiarDtoParaEntidade(dto, comic);
+		
 		comic = repositorio.save(comic);
 		ComicDTO newDto = new ComicDTO(comic);
 		configuraRegrasParaExibicao(newDto);

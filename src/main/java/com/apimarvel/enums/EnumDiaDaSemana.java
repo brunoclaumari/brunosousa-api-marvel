@@ -1,7 +1,7 @@
 package com.apimarvel.enums;
 
 public enum EnumDiaDaSemana {
-	SEGUNDA(1),TERCA(2),QUARTA(3),QUINTA(4),SEXTA(5),NENHUM(0);
+	NENHUM(0),SEGUNDA(1),TERCA(2),QUARTA(3),QUINTA(4),SEXTA(5);
 
 	private int diaDaSemana;
 	
@@ -16,5 +16,4 @@ public enum EnumDiaDaSemana {
 	public void setDiaDaSemana(int diaDaSemana) {
 		this.diaDaSemana = diaDaSemana;
 	}
-
 }
